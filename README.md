@@ -11,4 +11,6 @@ because our timeout is fixed, it will keep dropping the packets. because it need
 0.02
 
 
-
+7-10 -> /2... 
+1-7 -> reduce to 1
+10 -> +1 
