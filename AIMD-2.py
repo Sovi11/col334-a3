@@ -27,8 +27,8 @@ def parse_input(input_string):
         x = x + L[i]
     return x
 
-srvr_ip = '127.0.0.1'
-# srvr_ip = "10.17.7.134"
+# srvr_ip = '127.0.0.1'
+srvr_ip = "10.17.7.134"
 srvr_port = 9802
 sa = (srvr_ip, srvr_port)
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -60,7 +60,7 @@ k = 10
 strt = time.time()
 flag1 = False
 rtt = 0.013 ##0.013 vayu
-rtt = 0.0005 ## self.
+# rtt = 0.0005 ## self.
 delta= 0.7 * rtt
 
 def parse_size(recvd):
@@ -86,17 +86,17 @@ while(sz > 1):
     print(f"CURRENT BURST SIZE = {k}")
     k = min(sz - 1, k)
     window = []
-    t1 = time.time()
     for _ in range(k):
         message1 = request_data(queue[-1] * packet_size, packet_size)
         udp.sendto(message1.encode('utf-8'), sa)
         window.append(queue[-1])
         queue.pop()
+    t1 = time.time()
     sz -= k
     cnt = 0
     time.sleep(rtt)
     udp.settimeout(delta/(3)*k)
-    for _ in range((3 * k)//2):
+    for _ in range(k):
         if(cnt == k):
             break
         try:
@@ -112,6 +112,8 @@ while(sz > 1):
             cnt = cnt
     print(f"effficiency :-> {cnt / k}")
     new_rtt = t2 - t1
+    # rtt = 0.8 * new_rtt + 0.2* rtt
+    print(f" rtt = {rtt}")
     next_k = k
     if(cnt/k > 0.89):
         next_k += 1
@@ -120,8 +122,13 @@ while(sz > 1):
         next_k //= 5
         next_k = max(3, next_k)
     else:
-        # time.sleep(rtt)
-        next_k = 2
+        # adding randomisation for ffs.
+        p = random.random()
+        if(p < 0.3):
+            next_k = 2
+        else:
+            time.sleep(rtt)
+            next_k = 3
     for i in range(k):
         if(vis[window[i]] == False):
             queue.append(window[i])
